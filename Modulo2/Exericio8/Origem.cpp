@@ -1,12 +1,8 @@
-/* Módulo 2 - código adaptado de https://learnopengl.com/#!Getting-started/Hello-Triangle
- *
- * Adaptado por Rossana Baptista Queiroz
- * para a disciplina de Processamento Gráfico - Jogos Digitais - Unisinos
- * Versão inicial: 7/4/2017
- * Última atualização em 12/05/2023
- * Melissa Viana Kunst
- *
- */
+/*
+*   Melissa Kunst
+*   Computação Gráfica
+*   Módulo 2
+*/
 
 #include <iostream>
 #include <string>
