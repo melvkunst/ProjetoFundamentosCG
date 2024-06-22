@@ -78,11 +78,11 @@ void Camera::setCameraPos(int key, float cameraSpeed) {
 	{
 		cameraPos -= cameraFront * cameraSpeed;
 	}
-	else if (key == GLFW_KEY_A)
+	else if (key == GLFW_KEY_D)
 	{
 		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 	}
-	else if (key == GLFW_KEY_D)
+	else if (key == GLFW_KEY_A)
 	{
 		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 	}
