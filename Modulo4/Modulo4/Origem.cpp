@@ -13,8 +13,6 @@
 #include <cassert>
 #include <cmath>
 #include <cstdio>
-using namespace std;
-
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp> 
@@ -24,14 +22,16 @@ using namespace std;
 #include "Shader.h"
 #include "Mesh.h"
 
+using namespace std;
+
 // Configuração da janela
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void setupWindow(GLFWwindow*& window);
-void resetRotation();
+void resetAllRotate();
 void setupTransformations(glm::mat4& model);
 
 // Configuração da geometria
-void readObjFile(string path);
+void readFromObj(string path);
 void readMtlFile(string path);
 int setupGeometry();
 int loadTexture(string path);
@@ -49,18 +49,18 @@ string basePath = "../../3D_Models/Suzanne/";
 string objFileName = "CuboTextured.obj";
 
 // Valores de iluminação
-vector<GLfloat> ambientReflectance;
-vector<GLfloat> specularReflectance;
-float shininess;
+vector<GLfloat> ka;
+vector<GLfloat> ks;
+float ns;
 
 // Tamanho da janela
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
 
 // Parâmetros de transformação
-bool rotateAroundX = false;
-bool rotateAroundY = false;
-bool rotateAroundZ = false;
+bool rotateX = false;
+bool rotateY = false;
+bool rotateZ = false;
 float scale = 200.0f;
 GLfloat translateX = 400.0f;
 GLfloat translateY = 300.0f;
@@ -77,7 +77,7 @@ int main()
     Shader shader("../shaders/sprite.vs", "../shaders/sprite.fs");
 
     // Ler arquivos OBJ e MTL
-    readObjFile(basePath + objFileName);
+    readFromObj(basePath + objFileName);
     readMtlFile(basePath + mtlFilePath);
 
     // Carregar textura
@@ -105,10 +105,10 @@ int main()
     object.initialize(VAO, (totalVertices.size() / 8), &shader, glm::vec3(-2.75f, 0.0f, 0.0f));
 
     // Configurar parâmetros de iluminação
-    shader.setVec3("ka", ambientReflectance[0], ambientReflectance[1], ambientReflectance[2]);
+    shader.setVec3("ka", ka[0], ka[1], ka[2]);
     shader.setFloat("kd", 0.7f);
-    shader.setVec3("ks", specularReflectance[0], specularReflectance[1], specularReflectance[2]);
-    shader.setFloat("q", shininess);
+    shader.setVec3("ks", ks[0], ks[1], ks[2]);
+    shader.setFloat("q", ns);
 
     shader.setVec3("lightPos", -2.0f, 100.0f, 2.0f);
     shader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
@@ -187,15 +187,15 @@ void readMtlFile(string path)
             else if (prefix == "Ka") {
                 glm::vec3 tempKa;
                 iss >> tempKa.x >> tempKa.y >> tempKa.z;
-                ambientReflectance = { tempKa.x, tempKa.y, tempKa.z };
+                ka = { tempKa.x, tempKa.y, tempKa.z };
             }
             else if (prefix == "Ks") {
                 glm::vec3 tempKs;
                 iss >> tempKs.x >> tempKs.y >> tempKs.z;
-                specularReflectance = { tempKs.x, tempKs.y, tempKs.z };
+                ks = { tempKs.x, tempKs.y, tempKs.z };
             }
             else if (prefix == "Ns") {
-                iss >> shininess;
+                iss >> ns;
             }
         }
     }
@@ -235,7 +235,7 @@ int setupGeometry()
     return VAO;
 }
 
-void readObjFile(string path) {
+void readFromObj(string path) {
     std::ifstream file(path);
 
     if (!file.is_open()) {
@@ -386,13 +386,13 @@ void setupTransformations(glm::mat4& model) {
     model = glm::translate(model, glm::vec3(translateX, translateY, translateZ));
 
     // Aplicar rotações
-    if (rotateAroundX) {
+    if (rotateX) {
         model = glm::rotate(model, angle, glm::vec3(1.0f, 0.0f, 0.0f));
     }
-    else if (rotateAroundY) {
+    else if (rotateY) {
         model = glm::rotate(model, angle, glm::vec3(0.0f, 1.0f, 0.0f));
     }
-    else if (rotateAroundZ) {
+    else if (rotateZ) {
         model = glm::rotate(model, angle, glm::vec3(0.0f, 0.0f, 1.0f));
     }
 
@@ -420,18 +420,18 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         glfwSetWindowShouldClose(window, GL_TRUE);
 
     if ((key == GLFW_KEY_X) && action == GLFW_PRESS) {
-        resetRotation();
-        rotateAroundX = true;
+        resetAllRotate();
+        rotateX = true;
     }
 
     if ((key == GLFW_KEY_Y) && action == GLFW_PRESS) {
-        resetRotation();
-        rotateAroundY = true;
+        resetAllRotate();
+        rotateY = true;
     }
 
     if ((key == GLFW_KEY_Z) && action == GLFW_PRESS) {
-        resetRotation();
-        rotateAroundZ = true;
+        resetAllRotate();
+        rotateZ = true;
     }
 
     // Translação
@@ -462,7 +462,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
     // Resetar visualização
     if ((key == GLFW_KEY_P) && action == GLFW_PRESS) {
-        resetRotation();
+        resetAllRotate();
         translateX = 400.0f;
         translateY = 300.0f;
         translateZ = 100.0f;
@@ -470,9 +470,9 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     }
 }
 
-void resetRotation() {
+void resetAllRotate() {
     // Resetar todas as rotações
-    rotateAroundX = false;
-    rotateAroundY = false;
-    rotateAroundZ = false;
+    rotateX = false;
+    rotateY = false;
+    rotateZ = false;
 }
