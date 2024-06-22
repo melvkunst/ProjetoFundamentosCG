@@ -36,7 +36,7 @@ int setupGeometry();
 const GLuint WIDTH = 1000, HEIGHT = 1000;
 
 // Código fonte do Vertex Shader (em GLSL): ainda hardcoded
-const GLchar* vertexShaderSource = "#version 450\n"
+const GLchar* vertexShaderSource = "#version 400\n"
 "layout (location = 0) in vec3 position;\n"
 "layout (location = 1) in vec3 color;\n"
 "uniform mat4 model;\n"
@@ -49,7 +49,7 @@ const GLchar* vertexShaderSource = "#version 450\n"
 "}\0";
 
 //Códifo fonte do Fragment Shader (em GLSL): ainda hardcoded
-const GLchar* fragmentShaderSource = "#version 450\n"
+const GLchar* fragmentShaderSource = "#version 400\n"
 "in vec4 finalColor;\n"
 "out vec4 color;\n"
 "void main()\n"
@@ -300,6 +300,8 @@ int setupGeometry()
 
 
 	};
+
+	std::cout << vertices << " ";
 
 	GLuint VBO, VAO;
 
