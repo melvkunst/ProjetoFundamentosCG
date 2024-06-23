@@ -29,7 +29,6 @@ using namespace std;
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void setupWindow(GLFWwindow*& window);
-void resetAllRotate();
 void setupTransformations(glm::mat4& model);
 void setupShader(Shader shader);
 
@@ -356,7 +355,7 @@ void setupWindow(GLFWwindow*& window) {
     }
 
     // Criar janela GLFW
-    window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Modulo 4 - Melissa Kunst", nullptr, nullptr);
+    window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Modulo 5 - Melissa Kunst", nullptr, nullptr);
     if (!window) {
         std::cerr << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -435,12 +434,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     camera.setCameraPos(key);
 }
 
-void resetAllRotate() {
-    // Resetar todas as rotações
-    rotateX = false;
-    rotateY = false;
-    rotateZ = false;
-}
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
